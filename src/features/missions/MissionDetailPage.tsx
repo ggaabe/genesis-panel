@@ -26,7 +26,7 @@ export default function MissionDetailPage() {
 
   if (!mission) return <Text>Loading...</Text>;
 
-  const canCancel = mission.status === 'running';
+  const canCancel = mission.status === 'running' || mission.status === 'queued';
   const canRetry = mission.status === 'failed' || mission.status === 'canceled' || mission.status === 'succeeded';
 
   return (
