@@ -15,4 +15,6 @@
 
 I used mantine for the UI library because it has many components that are ready to use which allows for focusing on the logic of the application rather than reinventing the wheel. I lazy-loaded all routes so that the bundle would be smaller on the initial load.
 
-I also split most of the redux store using injectable endpoints so that the initial bundle would remain small and the endpoints themselves would be loaded on demand. 
+I also split most of the redux store using injectable endpoints so that the initial bundle would remain small and the endpoints themselves would be loaded on demand.
+
+Some tradeoffs with this is you can have a little less flexibility in the component design / implementation but it's good for when delivering features in a crunch. The injectable endpoints benefits can vary as well for applications that can change a lot over time, as different endpoints could move from more rarely used to more frequently used and the benefit of lazy loading them could become diminished.
