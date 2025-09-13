@@ -16,10 +16,8 @@ export const api = createApi({
               { type: 'Missions', id: 'LIST' },
             ]
           : [{ type: 'Missions', id: 'LIST' }],
-      pollInterval: 1000,
     }),
   }),
 });
 
 export const { useGetMissionsQuery } = api;
-

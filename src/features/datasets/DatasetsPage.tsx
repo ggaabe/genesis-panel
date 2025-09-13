@@ -1,7 +1,7 @@
 import { Group, Paper, ScrollArea, Stack, Table, Text, TextInput, Title } from '@mantine/core';
 import { useMemo, useState } from 'react';
 import { useGetDatasetsQuery } from '../../store/datasets/datasets';
-import { Dataset } from '../../models';
+import type { Dataset } from '../../models';
 import { fmtDate } from '../../utils/time';
 
 export default function DatasetsPage() {
@@ -55,4 +55,3 @@ export default function DatasetsPage() {
     </Stack>
   );
 }
-

@@ -1,22 +1,28 @@
 import { useParams } from 'react-router-dom';
 import { useCancelMissionMutation, useGetMissionLogsQuery, useGetMissionQuery, useRetryMissionMutation } from '../../store/missions/missionManagement';
-import { ActionIcon, Button, Code, CopyButton, Group, Paper, ScrollArea, Stack, Tabs, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Code, CopyButton, Group, Modal, Paper, ScrollArea, Stack, Tabs, Text, Title } from '@mantine/core';
 import { MissionStatusBadge } from '../../components/StatusBadge';
 import { fmtDate, fmtDuration } from '../../utils/time';
 import { IconCopy } from '@tabler/icons-react';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function MissionDetailPage() {
   const { id = '' } = useParams();
-  const { data, isFetching } = useGetMissionQuery(id, { skip: !id });
+  const { data } = useGetMissionQuery(id, { skip: !id, pollingInterval: 1000 });
   const [cancel, { isLoading: canceling }] = useCancelMissionMutation();
   const [retry, { isLoading: retrying }] = useRetryMissionMutation();
-  const logsQuery = useGetMissionLogsQuery({ id, after: 0 }, { skip: !id });
+  const logsQuery = useGetMissionLogsQuery({ id, after: 0 }, { skip: !id, pollingInterval: 1000 });
 
   const mission = data?.mission;
   const artifacts = data?.artifacts ?? [];
   const logs = useMemo(() => logsQuery.data ?? data?.logs ?? [], [logsQuery.data, data]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [openArt, setOpenArt] = useState<string | null>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [logs?.length]);
 
   if (!mission) return <Text>Loading...</Text>;
 
@@ -47,7 +53,7 @@ export default function MissionDetailPage() {
 
         <Tabs.Panel value="logs" pt="xs">
           <Paper withBorder>
-            <ScrollArea h={300} viewportRef={scrollRef} onUpdate={() => { const el = scrollRef.current; if (el) el.scrollTop = el.scrollHeight; }}>
+            <ScrollArea h={300} viewportRef={scrollRef}>
               <Stack p="sm" gap="xs">
                 {logs.map((l) => (
                   <Group key={l.id} gap="xs">
@@ -65,25 +71,33 @@ export default function MissionDetailPage() {
         <Tabs.Panel value="artifacts" pt="xs">
           <Stack>
             {artifacts.map((a) => (
-              <Paper key={a.id} withBorder p="sm">
+              <Paper key={a.id} withBorder p="sm" onClick={() => setOpenArt(a.id)} style={{ cursor: 'pointer' }}>
                 <Group justify="space-between">
                   <Group>
                     <Text fw={600}>{a.filename}</Text>
                     <Text c="dimmed" size="sm">{a.filetype} • {Math.round(a.size / 1024)} KB</Text>
                   </Group>
-                  <CopyButton value={a.textContent}>
-                    {({ copied, copy }) => (
-                      <ActionIcon variant="subtle" color={copied ? 'teal' : 'gray'} onClick={copy} title="Copy JSON">
-                        <IconCopy size={16} />
-                      </ActionIcon>
-                    )}
-                  </CopyButton>
+                  <Text size="sm" c="blue">View</Text>
                 </Group>
-                <ScrollArea h={160} mt="xs"><Code block mah={160}>{a.textContent}</Code></ScrollArea>
               </Paper>
             ))}
             {artifacts.length === 0 && <Text c="dimmed">No artifacts yet</Text>}
           </Stack>
+          {artifacts.map((a) => (
+            <Modal key={a.id} opened={openArt === a.id} onClose={() => setOpenArt(null)} title={a.filename} size="lg">
+              <Group justify="space-between" mb="xs">
+                <Text c="dimmed" size="sm">{a.filetype} • {Math.round(a.size / 1024)} KB</Text>
+                <CopyButton value={a.textContent}>
+                  {({ copied, copy }) => (
+                    <ActionIcon variant="subtle" color={copied ? 'teal' : 'gray'} onClick={copy} title="Copy contents">
+                      <IconCopy size={16} />
+                    </ActionIcon>
+                  )}
+                </CopyButton>
+              </Group>
+              <ScrollArea h={300}><Code block>{a.textContent}</Code></ScrollArea>
+            </Modal>
+          ))}
         </Tabs.Panel>
 
         <Tabs.Panel value="metrics" pt="xs">
@@ -108,4 +122,3 @@ function Stat({ label, value }: { label: string; value: string | number }) {
     </Stack>
   );
 }
-

@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Button, Group, Modal, Paper, ScrollArea, Stack, Tabl
 import { useDisclosure } from '@mantine/hooks';
 import { Suspense, lazy, useMemo, useState } from 'react';
 import { useGetMissionsQuery } from '../../store/api';
-import { Mission } from '../../models';
+import type { Mission } from '../../models';
 import { MissionStatusBadge } from '../../components/StatusBadge';
 import { useNavigate } from 'react-router-dom';
 import { IconRefresh } from '@tabler/icons-react';
@@ -11,7 +11,7 @@ import { fmtDate, fmtDuration } from '../../utils/time';
 const CreateMissionForm = lazy(() => import('./CreateMissionForm'));
 
 export default function MissionsPage() {
-  const { data: missions = [], refetch, isFetching } = useGetMissionsQuery();
+  const { data: missions = [], refetch, isFetching } = useGetMissionsQuery(undefined, { pollingInterval: 1000 });
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function MissionsPage() {
                 <Table.Th>ID</Table.Th>
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Status</Table.Th>
-                <Table.Th>Created</Table.Th>
+                <Table.Th>Started</Table.Th>
                 <Table.Th>Duration</Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -46,8 +46,8 @@ export default function MissionsPage() {
                   <Table.Td><Badge variant="light">{m.id.slice(0, 8)}</Badge></Table.Td>
                   <Table.Td>{m.name}</Table.Td>
                   <Table.Td><MissionStatusBadge status={m.status}/></Table.Td>
-                  <Table.Td>{fmtDate(m.createdAt)}</Table.Td>
-                  <Table.Td>{fmtDuration((m.startedAt ?? m.createdAt) ? (m.completedAt ? m.completedAt : Date.now()) - (m.startedAt ?? m.createdAt) : 0)}</Table.Td>
+                  <Table.Td>{m.startedAt ? fmtDate(m.startedAt) : '-'}</Table.Td>
+                  <Table.Td>{m.startedAt ? fmtDuration((m.completedAt ? m.completedAt : Date.now()) - m.startedAt) : '-'}</Table.Td>
                 </Table.Tr>
               ))}
               {filtered.length === 0 && (
@@ -68,4 +68,3 @@ export default function MissionsPage() {
     </Stack>
   );
 }
-

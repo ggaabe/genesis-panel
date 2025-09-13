@@ -1,12 +1,17 @@
-import { Paper, Stack, Text, Title } from '@mantine/core';
+import { Paper, Stack, Text, Title, Group, Badge } from '@mantine/core';
 import { useGetPipelineQuery } from '../../store/pipeline/pipeline';
-import { PipelineNode } from '../../models';
+import type { PipelineNode } from '../../models';
+import { useMemo, useState } from 'react';
 import { PipelineStatusBadge } from '../../components/StatusBadge';
 
 export default function PipelinePage() {
   const { data } = useGetPipelineQuery();
   const nodes = data?.nodes ?? [];
   const edges = data?.edges ?? [];
+  const [selected, setSelected] = useState<string | null>(null);
+  const selectedNode = useMemo(() => nodes.find((n) => n.id === selected) || null, [nodes, selected]);
+  const upstream = useMemo(() => edges.filter((e) => e.to === selected).map((e) => nodes.find((n) => n.id === e.from)!).filter(Boolean), [edges, nodes, selected]);
+  const downstream = useMemo(() => edges.filter((e) => e.from === selected).map((e) => nodes.find((n) => n.id === e.to)!).filter(Boolean), [edges, nodes, selected]);
 
   return (
     <Stack>
@@ -29,17 +34,36 @@ export default function PipelinePage() {
         </svg>
         {nodes.map((n: PipelineNode) => (
           <div key={n.id} style={{ position: 'absolute', left: n.x, top: n.y, width: 160 }}>
-            <NodeCard node={n} />
+            <NodeCard node={n} active={selected === n.id} onClick={() => setSelected(n.id)} />
           </div>
         ))}
       </Paper>
+      {selectedNode && (
+        <Paper withBorder p="sm">
+          <Title order={5}>Node: {selectedNode.name}</Title>
+          <Group gap="md" mt="xs">
+            <Text size="sm">Owner: {selectedNode.owners.join(', ')}</Text>
+            <Text size="sm">Last run: {new Date(selectedNode.lastRun).toLocaleString()}</Text>
+          </Group>
+          <Group align="start" gap="xl" mt="xs">
+            <div>
+              <Text size="sm" fw={600} mb={4}>Upstream</Text>
+              <Group gap="xs">{upstream.map((n) => <Badge key={n.id} variant="light">{n.name}</Badge>)}</Group>
+            </div>
+            <div>
+              <Text size="sm" fw={600} mb={4}>Downstream</Text>
+              <Group gap="xs">{downstream.map((n) => <Badge key={n.id} variant="light">{n.name}</Badge>)}</Group>
+            </div>
+          </Group>
+        </Paper>
+      )}
     </Stack>
   );
 }
 
-function NodeCard({ node }: { node: PipelineNode }) {
+function NodeCard({ node, active, onClick }: { node: PipelineNode; active?: boolean; onClick?: () => void }) {
   return (
-    <Paper withBorder p="xs" radius="md">
+    <Paper withBorder p="xs" radius="md" onClick={onClick} style={{ cursor: 'pointer', outline: active ? '2px solid var(--mantine-color-blue-5)' : undefined }}>
       <Text fw={600}>{node.name}</Text>
       <PipelineStatusBadge status={node.status} />
       <Text size="xs" c="dimmed">Owner: {node.owners[0]}</Text>
@@ -47,4 +71,3 @@ function NodeCard({ node }: { node: PipelineNode }) {
     </Paper>
   );
 }
-

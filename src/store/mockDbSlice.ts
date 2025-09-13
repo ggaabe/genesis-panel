@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { Artifact, Dataset, Log, Mission, PipelineGraph } from '../models';
 
 export interface MockDbState {
@@ -67,4 +67,3 @@ export const {
 } = mockDbSlice.actions;
 
 export default mockDbSlice.reducer;
-

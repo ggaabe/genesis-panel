@@ -1,11 +1,11 @@
-import { lazy } from 'react';
+import { lazy, type LazyExoticComponent, type ComponentType } from 'react';
 import type { ReactNode } from 'react';
 
 export interface AppRoute {
   path: string;
   label: string;
   icon?: ReactNode;
-  element: React.LazyExoticComponent<() => JSX.Element>;
+  element: LazyExoticComponent<ComponentType<any>>;
 }
 
 export const routes: AppRoute[] = [
@@ -30,4 +30,3 @@ export const routes: AppRoute[] = [
     element: lazy(() => import('../features/pipeline/PipelinePage')),
   },
 ];
-

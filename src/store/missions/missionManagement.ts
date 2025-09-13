@@ -7,28 +7,26 @@ export const missionManagementApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getMission: builder.query<MissionDetail, string>({
       query: (id) => ({ url: `/missions/${id}`, method: 'GET' }),
-      providesTags: (result, error, id) => [
+      providesTags: (_result, _error, id) => [
         { type: 'Mission', id },
         { type: 'Logs', id },
         { type: 'Artifacts', id },
       ],
-      pollInterval: 1000,
     }),
     getMissionLogs: builder.query<Log[], { id: string; after?: number }>({
       query: ({ id, after }) => ({ url: `/missions/${id}/logs${after ? `?after=${after}` : ''}`, method: 'GET' }),
-      providesTags: (result, err, arg) => [{ type: 'Logs', id: arg.id }],
-      pollInterval: 1000,
+      providesTags: (_result, _err, arg) => [{ type: 'Logs', id: arg.id }],
     }),
     cancelMission: builder.mutation<Mission, string>({
       query: (id) => ({ url: `/missions/${id}/cancel`, method: 'POST' }),
-      invalidatesTags: (result, err, id) => [
+      invalidatesTags: (_result, _err, id) => [
         { type: 'Mission', id },
         { type: 'Missions', id: 'LIST' },
       ],
     }),
     retryMission: builder.mutation<Mission, string>({
       query: (id) => ({ url: `/missions/${id}/retry`, method: 'POST' }),
-      invalidatesTags: (result, err, id) => [
+      invalidatesTags: (_result, _err, id) => [
         { type: 'Mission', id },
         { type: 'Missions', id: 'LIST' },
       ],
@@ -37,4 +35,3 @@ export const missionManagementApi = api.injectEndpoints({
 });
 
 export const { useGetMissionQuery, useGetMissionLogsQuery, useCancelMissionMutation, useRetryMissionMutation } = missionManagementApi;
-
