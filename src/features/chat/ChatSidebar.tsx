@@ -1,4 +1,4 @@
-import { Button, Group, ScrollArea, Stack, Text, Textarea, Title } from '@mantine/core';
+import { Button, Group, ScrollArea, Stack, Text, Textarea, Title, Paper } from '@mantine/core';
 import { useChat } from './ChatContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -14,15 +14,17 @@ export function ChatSidebar() {
       <ScrollArea style={{ flex: 1 }}>
         <Stack>
           {messages.map((m) => (
-            <Stack key={m.id} p="xs" bg={m.role === 'agent' ? 'var(--mantine-color-gray-1)' : 'transparent'} style={{ borderRadius: 8 }}>
-              <Group gap="xs">
-                <Text fw={600}>{m.role === 'agent' ? 'Agent' : 'You'}</Text>
-                <Text c="dimmed" size="xs">{new Date(m.ts).toLocaleTimeString()}</Text>
-              </Group>
-              <Text size="sm">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-              </Text>
-            </Stack>
+            <Paper key={m.id} withBorder p="xs" radius="md">
+              <Stack gap={4}>
+                <Group gap="xs">
+                  <Text fw={600}>{m.role === 'agent' ? 'Agent' : 'You'}</Text>
+                  <Text c="dimmed" size="xs">{new Date(m.ts).toLocaleTimeString()}</Text>
+                </Group>
+                <Text size="sm">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                </Text>
+              </Stack>
+            </Paper>
           ))}
         </Stack>
       </ScrollArea>
@@ -32,6 +34,12 @@ export function ChatSidebar() {
         minRows={2}
         value={input}
         onChange={(e) => setInput(e.currentTarget.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (input.trim()) { send(input.trim()); setInput(''); }
+          }
+        }}
       />
       <Group justify="right">
         <Button onClick={() => { if (input.trim()) { send(input.trim()); setInput(''); } }}>Send</Button>
@@ -39,4 +47,3 @@ export function ChatSidebar() {
     </Stack>
   );
 }
-

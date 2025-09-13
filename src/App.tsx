@@ -1,4 +1,4 @@
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, localStorageColorSchemeManager } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
@@ -10,7 +10,7 @@ import { ChatProvider } from './features/chat/ChatContext';
 export default function App() {
   return (
     <Provider store={store}>
-      <MantineProvider>
+      <MantineProvider defaultColorScheme="auto" colorSchemeManager={localStorageColorSchemeManager({ key: 'genesis-color-scheme' })}>
         <Notifications />
         <ChatProvider>
           <BrowserRouter>
