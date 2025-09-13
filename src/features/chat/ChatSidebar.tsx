@@ -29,6 +29,7 @@ export function ChatSidebar() {
                 withBorder
                 p="xs"
                 radius="md"
+                bg="var(--mantine-color-gray-light)"
                 data-testid="chat-msg-agent"
               >
                 <Stack gap={4}>
