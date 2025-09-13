@@ -90,16 +90,33 @@ test.describe('Genesis Panel', () => {
 
   test('Datasets: search and sort', async ({ page }) => {
     await page.getByTestId('nav-datasets').click();
-    const firstBefore = await page.locator('[data-testid^="dataset-row-"]').first().innerText();
-    // Sort by rows asc then desc
+    const rowSelector = '[data-testid^="dataset-row-"]';
+    const rows = page.locator(rowSelector);
+    await rows.first().waitFor();
+    const parseTopNRows = async (n = 5) => {
+      const cells = page.locator(`${rowSelector} td:nth-child(2)`); // rows column
+      const count = await cells.count();
+      const values: number[] = [];
+      for (let i = 0; i < Math.min(n, count); i++) {
+        const t = await cells.nth(i).innerText();
+        values.push(Number(t.replace(/,/g, '')));
+      }
+      return values;
+    };
+    const isAscending = (arr: number[]) => arr.every((v, i, a) => i === 0 || a[i - 1] <= v);
+    const isDescending = (arr: number[]) => arr.every((v, i, a) => i === 0 || a[i - 1] >= v);
+
+    // Sort by rows asc
     await page.getByTestId('th-rows').click();
-    const firstAsc = await page.locator('[data-testid^="dataset-row-"]').first().innerText();
+    // wait until order stabilizes as ascending
+    await expect.poll(async () => isAscending(await parseTopNRows()) ? 'asc' : 'no').toBe('asc');
+
+    // Sort by rows desc
     await page.getByTestId('th-rows').click();
-    const firstDesc = await page.locator('[data-testid^="dataset-row-"]').first().innerText();
-    expect(firstAsc).not.toEqual(firstDesc);
+    await expect.poll(async () => isDescending(await parseTopNRows()) ? 'desc' : 'no').toBe('desc');
+
     // Search filters
     await page.getByTestId('datasets-search').fill('dataset_01');
-    const rows = page.locator('[data-testid^="dataset-row-"]');
     await expect(rows).toHaveCount(1);
   });
 

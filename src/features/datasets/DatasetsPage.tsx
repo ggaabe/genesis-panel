@@ -21,7 +21,7 @@ export default function DatasetsPage() {
       return dir === 'asc' ? cmp : -cmp;
     });
     return sorted;
-  }, [datasets, search, sort]);
+  }, [datasets, search, sort, dir]);
 
   const setSortColumn = (col: 'name' | 'rows' | 'lastUpdated') => {
     if (sort === col) setDir((d) => (d === 'asc' ? 'desc' : 'asc'));
