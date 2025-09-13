@@ -34,6 +34,57 @@ function makePipeline(): PipelineGraph {
   return { nodes, edges };
 }
 
+function makeCompletedMission(idx: number, status: Mission['status'] = 'succeeded') {
+  const id = `m_seed_${idx}`;
+  const createdAt = now() - (120_000 + idx * 15_000);
+  const startedAt = createdAt + 10_000;
+  const completedAt = createdAt + 15_000;
+  const mission: Mission = {
+    id,
+    name: `Seed Mission ${idx}`,
+    source: ['s3', 'postgres', 'api'][idx % 3],
+    goal: 'Demonstrate completed mission',
+    status: status === 'queued' || status === 'running' ? 'succeeded' : status,
+    createdAt,
+    startedAt,
+    completedAt,
+  };
+  const logs: Log[] = [
+    { id: `${id}_l1`, missionId: id, ts: createdAt, level: 'info', message: 'Mission queued' },
+    { id: `${id}_l2`, missionId: id, ts: startedAt, level: 'info', message: 'Mission started' },
+    { id: `${id}_l3`, missionId: id, ts: startedAt + 2000, level: 'info', message: 'Fetching data...' },
+    { id: `${id}_l4`, missionId: id, ts: startedAt + 4000, level: 'info', message: 'Processing batch 1/3' },
+    { id: `${id}_l5`, missionId: id, ts: startedAt + 6000, level: status === 'succeeded' ? 'info' : 'error', message: status === 'succeeded' ? 'Writing artifacts' : 'Encountered an error' },
+    { id: `${id}_l6`, missionId: id, ts: completedAt, level: status === 'succeeded' ? 'info' : 'error', message: status === 'succeeded' ? 'Mission succeeded' : 'Mission failed' },
+  ];
+  const artifacts: Artifact[] = status === 'succeeded' ? [
+    { id: `${id}_a1`, missionId: id, filetype: 'json', filename: `seed_${idx}.json`, size: 2345, textContent: JSON.stringify({ result: 'ok', missionId: id }, null, 2) },
+  ] : [];
+  return { mission, logs, artifacts };
+}
+
+function makeSeedData() {
+  const m1 = makeCompletedMission(1, 'succeeded');
+  const m2 = makeCompletedMission(2, 'failed');
+  const m3 = makeCompletedMission(3, 'succeeded');
+  const missions: Record<string, Mission> = {
+    [m1.mission.id]: m1.mission,
+    [m2.mission.id]: m2.mission,
+    [m3.mission.id]: m3.mission,
+  };
+  const logsByMission: Record<string, Log[]> = {
+    [m1.mission.id]: m1.logs,
+    [m2.mission.id]: m2.logs,
+    [m3.mission.id]: m3.logs,
+  };
+  const artifactsByMission: Record<string, Artifact[]> = {
+    [m1.mission.id]: m1.artifacts,
+    [m2.mission.id]: m2.artifacts,
+    [m3.mission.id]: m3.artifacts,
+  };
+  return { missions, logsByMission, artifactsByMission };
+}
+
 export interface MockDbState {
   missions: Record<string, Mission>;
   logsByMission: Record<string, Log[]>;
@@ -42,10 +93,11 @@ export interface MockDbState {
   pipeline: PipelineGraph | null;
 }
 
+const seeds = makeSeedData();
 const initialState: MockDbState = {
-  missions: {},
-  logsByMission: {},
-  artifactsByMission: {},
+  missions: seeds.missions,
+  logsByMission: seeds.logsByMission,
+  artifactsByMission: seeds.artifactsByMission,
   datasets: makeDatasets(20),
   pipeline: makePipeline(),
 };
