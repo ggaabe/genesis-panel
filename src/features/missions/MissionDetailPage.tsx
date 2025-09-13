@@ -39,8 +39,8 @@ export default function MissionDetailPage() {
         <Group>
           <Text c="dimmed">Started: {fmtDate(mission.createdAt)}</Text>
           <Text c="dimmed">Duration: {fmtDuration((mission.startedAt ?? mission.createdAt) ? (mission.completedAt ? mission.completedAt : Date.now()) - (mission.startedAt ?? mission.createdAt) : 0)}</Text>
-          <Button color="red" disabled={!canCancel} loading={canceling} onClick={() => cancel(mission.id)}>Cancel</Button>
-          <Button variant="light" disabled={!canRetry} loading={retrying} onClick={() => retry(mission.id)}>Retry</Button>
+          <Button data-testid="btn-cancel" color="red" disabled={!canCancel} loading={canceling} onClick={() => cancel(mission.id)}>Cancel</Button>
+          <Button data-testid="btn-retry" variant="light" disabled={!canRetry} loading={retrying} onClick={() => retry(mission.id)}>Retry</Button>
         </Group>
       </Group>
 
@@ -54,9 +54,9 @@ export default function MissionDetailPage() {
         <Tabs.Panel value="logs" pt="xs">
           <Paper withBorder>
             <ScrollArea h={300} viewportRef={scrollRef}>
-              <Stack p="sm" gap="xs">
+              <Stack p="sm" gap="xs" data-testid="logs-container">
                 {logs.map((l) => (
-                  <Group key={l.id} gap="xs">
+                  <Group key={l.id} gap="xs" data-testid="log-line">
                     <Text c="dimmed" size="xs">{new Date(l.ts).toLocaleTimeString()}</Text>
                     <Code color={l.level === 'error' ? 'red' : l.level === 'warn' ? 'yellow' : 'blue'}>{l.level.toUpperCase()}</Code>
                     <Text size="sm">{l.message}</Text>
@@ -71,7 +71,7 @@ export default function MissionDetailPage() {
         <Tabs.Panel value="artifacts" pt="xs">
           <Stack>
             {artifacts.map((a) => (
-              <Paper key={a.id} withBorder p="sm" onClick={() => setOpenArt(a.id)} style={{ cursor: 'pointer' }}>
+              <Paper key={a.id} data-testid={`artifact-item-${a.id}`} withBorder p="sm" onClick={() => setOpenArt(a.id)} style={{ cursor: 'pointer' }}>
                 <Group justify="space-between">
                   <Group>
                     <Text fw={600}>{a.filename}</Text>

@@ -29,7 +29,7 @@ export function ChatSidebar() {
                 withBorder
                 p="xs"
                 radius="md"
-                bg="var(--mantine-color-gray-light)"
+                data-testid="chat-msg-agent"
               >
                 <Stack gap={4}>
                   <Group gap="xs">
@@ -46,7 +46,7 @@ export function ChatSidebar() {
                 </Stack>
               </Paper>
             ) : (
-              <Stack key={m.id} p="xs">
+              <Stack key={m.id} p="xs" data-testid="chat-msg-user">
                 <Group gap="xs">
                   <Text fw={600}>You</Text>
                   <Text c="dimmed" size="xs">
@@ -68,6 +68,7 @@ export function ChatSidebar() {
         autosize
         minRows={2}
         value={input}
+        data-testid="chat-input"
         onChange={(e) => setInput(e.currentTarget.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
@@ -81,6 +82,7 @@ export function ChatSidebar() {
       />
       <Group justify="right">
         <Button
+          data-testid="chat-send"
           onClick={() => {
             if (input.trim()) {
               send(input.trim());

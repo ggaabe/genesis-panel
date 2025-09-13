@@ -2,9 +2,9 @@ import { MantineProvider, localStorageColorSchemeManager } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, useRoutes } from 'react-router-dom';
 import AppShell from './app/AppShell';
-import { routes } from './routes/routes';
+import { appRoutes } from './routes/routes';
 import { ChatProvider } from './features/chat/ChatContext';
 
 export default function App() {
@@ -14,16 +14,21 @@ export default function App() {
         <Notifications />
         <ChatProvider>
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<AppShell />}> 
-                {routes.map((r) => (
-                  <Route key={r.path} path={r.path} element={<r.element />} />
-                ))}
-              </Route>
-            </Routes>
+            <AppRoutes />
           </BrowserRouter>
         </ChatProvider>
       </MantineProvider>
     </Provider>
   );
+}
+
+function AppRoutes() {
+  const element = useRoutes([
+    {
+      path: '/',
+      element: <AppShell />,
+      children: appRoutes,
+    },
+  ]);
+  return element;
 }

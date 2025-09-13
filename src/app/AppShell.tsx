@@ -1,7 +1,7 @@
 import { Suspense, useState } from 'react';
 import { AppShell as MantineAppShell, Burger, Group, NavLink, ScrollArea, Text, ActionIcon, useMantineColorScheme } from '@mantine/core';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { routes } from '../routes/routes';
+import { navRoutes } from '../routes/routes';
 import { ChatSidebar } from '../features/chat/ChatSidebar';
 import AppErrorBoundary from '../components/AppErrorBoundary';
 import { IconMoon, IconSun } from '@tabler/icons-react';
@@ -29,11 +29,12 @@ export function AppShell() {
       </MantineAppShell.Header>
       <MantineAppShell.Navbar p="xs">
         <ScrollArea>
-          {routes.filter(r => !r.path.includes(':')).map((r) => (
+          {navRoutes.map((r) => (
             <NavLink
               key={r.path}
               label={r.label}
               active={loc.pathname === r.path}
+              data-testid={`nav-${r.label.toLowerCase()}`}
               onClick={() => navigate(r.path)}
             />
           ))}

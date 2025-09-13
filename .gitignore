@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+*.zip
+**/.last_run.json
+**/error-context.md
 
 # Editor directories and files
 .vscode/*

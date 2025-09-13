@@ -23,8 +23,8 @@ export default function MissionsPage() {
       <Group justify="space-between">
         <Title order={3}>Missions</Title>
         <Group>
-          <ActionIcon variant="subtle" onClick={() => refetch()} loading={isFetching}><IconRefresh size={16}/></ActionIcon>
-          <Button onClick={open}>Create Mission</Button>
+          <ActionIcon variant="subtle" onClick={() => refetch()} loading={isFetching} data-testid="btn-refresh-missions"><IconRefresh size={16}/></ActionIcon>
+          <Button onClick={open} data-testid="btn-create-mission">Create Mission</Button>
         </Group>
       </Group>
       <TextInput placeholder="Search missions" value={search} onChange={(e) => setSearch(e.currentTarget.value)} />
@@ -42,12 +42,12 @@ export default function MissionsPage() {
             </Table.Thead>
             <Table.Tbody>
               {filtered.map((m: Mission) => (
-                <Table.Tr key={m.id} onClick={() => navigate(`/missions/${m.id}`)} style={{ cursor: 'pointer' }}>
+                <Table.Tr key={m.id} data-testid={`mission-row-${m.id}`} data-mission-id={m.id} onClick={() => navigate(`/missions/${m.id}`)} style={{ cursor: 'pointer' }}>
                   <Table.Td><Badge variant="light">{m.id.slice(0, 8)}</Badge></Table.Td>
                   <Table.Td>{m.name}</Table.Td>
-                  <Table.Td><MissionStatusBadge status={m.status}/></Table.Td>
-                  <Table.Td>{m.startedAt ? fmtDate(m.startedAt) : '-'}</Table.Td>
-                  <Table.Td>{m.startedAt ? fmtDuration((m.completedAt ? m.completedAt : Date.now()) - m.startedAt) : '-'}</Table.Td>
+                  <Table.Td data-testid={`mission-status-${m.id}`}><MissionStatusBadge status={m.status}/></Table.Td>
+                  <Table.Td data-testid={`mission-started-${m.id}`}>{m.startedAt ? fmtDate(m.startedAt) : '-'}</Table.Td>
+                  <Table.Td data-testid={`mission-duration-${m.id}`}>{m.startedAt ? fmtDuration((m.completedAt ? m.completedAt : Date.now()) - m.startedAt) : '-'}</Table.Td>
                 </Table.Tr>
               ))}
               {filtered.length === 0 && (

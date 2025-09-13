@@ -91,7 +91,7 @@ export default function PipelinePage() {
         ))}
       </Paper>
       {selectedNode && (
-        <Paper withBorder p="sm">
+        <Paper withBorder p="sm" data-testid="pipeline-details">
           <Title order={5}>Node: {selectedNode.name}</Title>
           <Group gap="md" mt="xs">
             <Text size="sm">Owner: {selectedNode.owners.join(", ")}</Text>
@@ -142,6 +142,7 @@ function NodeCard({
 }) {
   return (
     <Paper
+      data-testid={`pipeline-node-${node.id}`}
       withBorder
       p="xs"
       radius="md"

@@ -36,7 +36,7 @@ export default function DatasetsPage() {
         <Title order={3}>Datasets</Title>
       </Group>
       <Group>
-        <TextInput placeholder="Search" value={search} onChange={(e) => setSearch(e.currentTarget.value)} />
+        <TextInput data-testid="datasets-search" placeholder="Search" value={search} onChange={(e) => setSearch(e.currentTarget.value)} />
       </Group>
       <Paper withBorder>
         <ScrollArea>
@@ -44,17 +44,17 @@ export default function DatasetsPage() {
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>
-                  <UnstyledButton onClick={() => setSortColumn('name')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <UnstyledButton data-testid="th-name" onClick={() => setSortColumn('name')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     Name <SortIcon active={sort === 'name'} />
                   </UnstyledButton>
                 </Table.Th>
                 <Table.Th>
-                  <UnstyledButton onClick={() => setSortColumn('rows')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <UnstyledButton data-testid="th-rows" onClick={() => setSortColumn('rows')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     Rows <SortIcon active={sort === 'rows'} />
                   </UnstyledButton>
                 </Table.Th>
                 <Table.Th>
-                  <UnstyledButton onClick={() => setSortColumn('lastUpdated')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <UnstyledButton data-testid="th-lastUpdated" onClick={() => setSortColumn('lastUpdated')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     Last Updated <SortIcon active={sort === 'lastUpdated'} />
                   </UnstyledButton>
                 </Table.Th>
@@ -62,7 +62,7 @@ export default function DatasetsPage() {
             </Table.Thead>
             <Table.Tbody>
               {filtered.map((d: Dataset) => (
-                <Table.Tr key={d.id}>
+                <Table.Tr key={d.id} data-testid={`dataset-row-${d.id}`}>
                   <Table.Td>{d.name}</Table.Td>
                   <Table.Td>{d.rows.toLocaleString()}</Table.Td>
                   <Table.Td>{fmtDate(d.lastUpdated)}</Table.Td>

@@ -21,11 +21,11 @@ export default function CreateMissionForm({ onDone }: { onDone?: () => void }) {
 
   return (
     <Stack>
-      <TextInput label="Name" placeholder="Mission name" value={name} onChange={(e) => setName(e.currentTarget.value)} error={errors.name} />
-      <Select label="Source" data={[{ value: 's3', label: 'S3' }, { value: 'postgres', label: 'Postgres' }, { value: 'api', label: 'API' }]} value={source} onChange={setSource} />
-      <Textarea label="Goal" placeholder="Describe the mission goal" minRows={3} value={goal} onChange={(e) => setGoal(e.currentTarget.value)} error={errors.goal} />
+      <TextInput data-testid="input-mission-name" label="Name" placeholder="Mission name" value={name} onChange={(e) => setName(e.currentTarget.value)} error={errors.name} />
+      <Select data-testid="select-mission-source" label="Source" data={[{ value: 's3', label: 'S3' }, { value: 'postgres', label: 'Postgres' }, { value: 'api', label: 'API' }]} value={source} onChange={setSource} />
+      <Textarea data-testid="input-mission-goal" label="Goal" placeholder="Describe the mission goal" minRows={3} value={goal} onChange={(e) => setGoal(e.currentTarget.value)} error={errors.goal} />
       <Group justify="right">
-        <Button loading={isLoading} onClick={submit}>Start Mission</Button>
+        <Button data-testid="btn-submit-mission" loading={isLoading} onClick={submit}>Start Mission</Button>
       </Group>
     </Stack>
   );
