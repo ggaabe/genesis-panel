@@ -1,13 +1,14 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useCancelMissionMutation, useGetMissionLogsQuery, useGetMissionQuery, useRetryMissionMutation } from '../../store/missions/missionManagement';
 import { ActionIcon, Button, Code, CopyButton, Group, Modal, Paper, ScrollArea, Stack, Tabs, Text, Title } from '@mantine/core';
 import { MissionStatusBadge } from '../../components/StatusBadge';
 import { fmtDate, fmtDuration } from '../../utils/time';
-import { IconCopy } from '@tabler/icons-react';
+import { IconArrowLeft, IconCopy } from '@tabler/icons-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function MissionDetailPage() {
   const { id = '' } = useParams();
+  const navigate = useNavigate();
   const { data } = useGetMissionQuery(id, { skip: !id, pollingInterval: 1000 });
   const [cancel, { isLoading: canceling }] = useCancelMissionMutation();
   const [retry, { isLoading: retrying }] = useRetryMissionMutation();
@@ -33,6 +34,15 @@ export default function MissionDetailPage() {
     <Stack>
       <Group justify="space-between">
         <Group>
+          <ActionIcon
+            variant="subtle"
+            onClick={() => navigate('/')}
+            aria-label="Back to missions"
+            data-testid="btn-back"
+            title="Back to missions"
+          >
+            <IconArrowLeft size={16} />
+          </ActionIcon>
           <Title order={3}>{mission.name}</Title>
           <MissionStatusBadge status={mission.status} />
         </Group>

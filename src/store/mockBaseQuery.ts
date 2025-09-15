@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 import { nanoid } from "nanoid/non-secure";
 import type { RootState } from "./store";
